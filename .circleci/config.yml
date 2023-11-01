@@ -156,10 +156,15 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-            yum -y update &&
-            yum -y install epel-release &&
-            yum -y install ansible &&
-            yum -y clean all
+            cat <<EOL > /etc/yum.repos.d/epel.repo
+            [epel]
+            name=Extra Packages for Enterprise Linux 7 - $basearch
+            baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch
+            enabled=1
+            gpgcheck=0
+            EOL
+            yum -y update
+            yum -y install ansible
             ansible --versiongi
       # Add ssh keys with fingerprint
       # attach workspace

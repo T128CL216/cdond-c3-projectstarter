@@ -153,30 +153,19 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run:
-          name: Install Ansible
-          command: |
-            cat <<EOL > /etc/yum.repos.d/epel.repo
-            [epel]
-            name=Extra Packages for Enterprise Linux 7 - $basearch
-            baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch
-            enabled=1
-            gpgcheck=0
-            EOL
-            yum -y update
-            yum -y install ansible
-            ansible --versiongi
-      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ["9c:21:50:8c:71:6c:ed:04:77:12:2e:ef:53:90:1d:6d"]
+      - attach_workspace:
+           at: ~/.circleci/ansible/
       # attach workspace
       - run:
           name: Install dependencies
           command: |
-            # Your code here
-            exit 1
+            apk add --update ansible
       - run:
           name: Configure server
           command: |
-            # Your code here
+            ansible-playbook -i ~/.circleci/ansible/inventory main4.yml
             exit 1
       # Here's where you will add some code to rollback on failure        
 
@@ -193,5 +182,6 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      #- deploy-infrastructure
-      - configure-infrastructure
+      - deploy-infrastructure
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]

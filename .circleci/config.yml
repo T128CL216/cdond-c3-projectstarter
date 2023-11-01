@@ -160,7 +160,7 @@ jobs:
             yum -y install epel-release &&
             yum -y install ansible &&
             yum -y clean all
-            ansible --version
+            ansible --versiongi
       # Add ssh keys with fingerprint
       # attach workspace
       - run:
@@ -188,4 +188,5 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      - deploy-infrastructure
+      #- deploy-infrastructure
+      - configure-infrastructure

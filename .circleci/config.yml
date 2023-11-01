@@ -88,7 +88,6 @@ jobs:
             npm audit fix --force --audit-level=critical
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
-
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -104,7 +103,6 @@ jobs:
             npm audit fix --force --audit-level=critical
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
-  
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
@@ -150,6 +148,32 @@ jobs:
           paths:
             - inventory
       - destroy-environment
+  configure-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install Ansible
+          command: |
+            yum -y update &&
+            yum -y install epel-release &&
+            yum -y install ansible &&
+            yum -y clean all
+            ansible --version
+      # Add ssh keys with fingerprint
+      # attach workspace
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+            exit 1
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+            exit 1
+      # Here's where you will add some code to rollback on failure        
 
 workflows:
   udacity_project:

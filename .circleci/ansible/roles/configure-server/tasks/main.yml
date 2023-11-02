@@ -27,8 +27,6 @@
   async: 2000
   poll: 0
 
-- name: "check node dependencies"
-  command: npm --version
 
 - name: "install pm2"
   become: true

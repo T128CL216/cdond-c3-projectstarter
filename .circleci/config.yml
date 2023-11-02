@@ -196,6 +196,8 @@ jobs:
       - image: circleci/node:14.18.1
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Run migrations
           command: |
@@ -207,11 +209,17 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
+            echo "this is the content"
             cat ~/project/backend/migrations.txt
+            echo "end of the content"
             if grep -q "success" ~/project/backend/migrations.txt
             then
-              curl https://kvdb.io/6U9WncsVQmgqvAA9EPC2h6/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              echo "we are in"
+              curl --insecure https://kvdb.io/6U9WncsVQmgqvAA9EPC2h6/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1' 
+            else
+            echo " we are out"
             fi
+
       - destroy-environment
       - revert-migrations
      # Here's where you will add some code to rollback on failure       
@@ -220,7 +228,7 @@ workflows:
   udacity_project:
     jobs:
       # - build-frontend
-      #- build-backend
+      - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
       # - test-backend:
@@ -234,6 +242,7 @@ workflows:
       #- deploy-infrastructure
       #- configure-infrastructure:
       #    requires: [deploy-infrastructure]
-      - run-migrations
+      - run-migrations:
+          requires: [build-backend]
        #   requires: [configure-infrastructure]
       

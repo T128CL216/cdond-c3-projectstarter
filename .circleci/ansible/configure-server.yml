@@ -12,15 +12,7 @@
     - ansible_host_key_checking: false
     - ansible_stdout_callback: yaml
 
-  # pre_tasks:
-  #   - name: "Check if Python 3 is installed"
-  #     ansible.builtin.command: /usr/bin/python3 --version
-  #     ignore_errors: yes
-  #     register: python_check
-    
-  #   - name: "Install Python 3"
-  #     ansible.builtin.command: sudo yum install -y python3
-  #     when: python_check.failed
+
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"

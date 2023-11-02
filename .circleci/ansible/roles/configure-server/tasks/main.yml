@@ -27,13 +27,8 @@
   async: 2000
   poll: 0
 
-- name: "install node dependencies"
-  become: true
-  yum:
-    name:
-      - npm # TODO: additional steps required before installing this
-    state: latest
-    update_cache: true
+- name: "check node dependencies"
+  command: npm --version
 
 - name: "install pm2"
   become: true

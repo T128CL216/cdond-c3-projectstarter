@@ -1,44 +1,25 @@
 ---
-- name: "update yum packages."
+- name: "Update apt packages"
   become: true
-  yum:
-    update_cache: true
+  apt:
+    update_cache: yes
 
-- name: "upgrade packages"
+- name: "Remove dependencies that are no longer required"
   become: true
-  yum:
-    name: "*"
+  apt:
+    autoremove: yes
+
+- name: "Install npm and nodejs"
+  become: true
+  apt:
+    name: ["npm", "nodejs"]
     state: latest
+    update_cache: yes
 
-- name: Install Node Source Repository
-  become: true
-  yum:
-    name: https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
-    state: present
-  async: 2000
-  poll: 0
-
-- name: Install Node.js
-  become: true
-  yum:
-    name: nodejs
-    state: present
-    extra_args: "--setopt=nodesource-nodejs.module_hotfixes=1"
-  async: 2000
-  poll: 0
-
-- name: "install node dependencies"
-  become: true
-  yum:
-    name:
-      - npm # TODO: additional steps required before installing this
-    state: latest
-    update_cache: true
-
-- name: "install pm2"
+- name: "Install pm2"
   become: true
   npm:
     name: pm2
-    global: true
-    production: true
+    global: yes
+    production: yes
     state: present

@@ -1,0 +1,59 @@
+---
+- name: "update yum packages."
+  become: true
+  yum:
+    update_cache: true
+
+- name: "upgrade packages"
+  become: true
+  yum:
+    name: "*"
+    state: latest
+
+- name: Install Node Source Repository
+  become: true
+  yum:
+    name: https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
+    state: present
+  async: 2000
+  poll: 0
+
+- name: Install Node.js
+  become: true
+  yum:
+    name: nodejs
+    state: present
+    extra_args: "--setopt=nodesource-nodejs.module_hotfixes=1"
+  async: 2000
+  poll: 0
+
+- name: "install node dependencies"
+  become: true
+  yum:
+    name:
+      - npm # TODO: additional steps required before installing this
+    state: latest
+    update_cache: true
+
+- name: "install pm2"
+  become: true
+  npm:
+    name: pm2
+    global: true
+    production: true
+    state: present
+
+- name: "create ~/web"
+  ansible.builtin.file:
+    path: ~/web
+    state: directory
+    mode: '0755'
+
+- name: "copy files"
+  copy:
+    src: index.js
+    dest: ~/web
+    backup: true
+
+- name: "start server"
+  shell: pm2 start ~/web/index.js -f

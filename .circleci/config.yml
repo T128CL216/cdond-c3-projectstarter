@@ -150,7 +150,7 @@ jobs:
       - destroy-environment
   configure-infrastructure:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - add_ssh_keys:
@@ -167,7 +167,7 @@ jobs:
           command: |
             ansible-playbook -i ~/.circleci/ansible/inventory main4.yml
             exit 1
-      # Here's where you will add some code to rollback on failure        
+      - destroy-environment       
 
 workflows:
   udacity_project:

@@ -17,12 +17,14 @@
     #   wait_for_connection:
     #     delay: 0
     #     timeout: 120
-
-    - name: "install python for Ansible."
-      command: test -e /usr/bin/python3 || (sudo yum update -y && sudo yum install -y python3)  # Replace with the appropriate package manager for your system
+    - name: "Check if Python 3 is installed"
+      ansible.builtin.command: /usr/bin/python3 --version
       ignore_errors: yes
-      changed_when: false 
-
+      register: python_check
+    
+    - name: "Install Python 3"
+      ansible.builtin.command: sudo yum install -y python3
+      when: python_check.failed
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"

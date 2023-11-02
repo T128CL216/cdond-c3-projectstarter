@@ -183,7 +183,7 @@ jobs:
           name: Configure server
           command: |
             ansible-playbook -i ~/.circleci/ansible/inventory .circleci/ansible/configure-server.yml
-      - destroy-environment
+      #- destroy-environment
   # run-migrations:
   #   docker:
   #     - image: circleci/node:13.8.0

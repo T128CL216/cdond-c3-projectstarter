@@ -13,10 +13,6 @@
     - ansible_stdout_callback: yaml
 
   pre_tasks:
-    - name: "wait 600 seconds for target connection to become reachable/usable."
-      wait_for_connection:
-        delay: 0
-        timeout: 120
     - name: "Check if Python 3 is installed"
       ansible.builtin.command: /usr/bin/python3 --version
       ignore_errors: yes

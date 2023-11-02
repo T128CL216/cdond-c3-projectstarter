@@ -1,18 +1,13 @@
 ---
-- name: "update yum packages."
+- name: "update dnf packages."
   become: true
-  yum:
-    update_cache: true
-
-- name: "upgrade packages"
-  become: true
-  yum:
-    name: "*"
+  ansible.builtin.dnf:
+    name: '*'
     state: latest
 
 - name: Install Node Source Repository
   become: true
-  yum:
+  ansible.builtin.dnf:
     name: https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
     state: present
   async: 2000
@@ -20,7 +15,7 @@
 
 - name: Install Node.js
   become: true
-  yum:
+  ansible.builtin.dnf:
     name: nodejs
     state: present
     extra_args: "--setopt=nodesource-nodejs.module_hotfixes=1"
@@ -29,7 +24,7 @@
 
 - name: "install node dependencies"
   become: true
-  yum:
+  ansible.builtin.dnf:
     name:
       - npm # TODO: additional steps required before installing this
     state: latest
@@ -37,7 +32,7 @@
 
 - name: "install pm2"
   become: true
-  npm:
+  ansible.builtin.dnf:
     name: pm2
     global: true
     production: true

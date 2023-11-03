@@ -209,21 +209,58 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
-            echo "this is the content"
-            cat ~/project/backend/migrations.txt
-            echo "end of the content"
             if grep -q "success" ~/project/backend/migrations.txt
             then
-              echo "we are in"
               curl --insecure https://kvdb.io/6U9WncsVQmgqvAA9EPC2h6/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1' 
-            else
-            echo " we are out"
             fi
-
+      - destroy-environment
+      - revert-migrations  
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Update packages
+          command: | 
+            sudo yum update -y
+      - run:
+          name: Install npm
+          command: | 
+            sudo yum install -y nodejs npm
+      - run:
+          name: Install tar
+          command: | 
+            yum install -y tar
+      - run:
+          name: Install GZIP
+          command: | 
+            yum install -y gzip
+      - run:
+          name: Get backend url
+          command: |
+            stack_name=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            instance_ids=$(aws cloudformation describe-stack-resources --stack-name "$stack_name" --query 'StackResources[?ResourceType==`AWS::EC2::Instance`].PhysicalResourceId' --output text)
+            ec2_ips=$(aws ec2 describe-instances --instance-ids $instance_ids --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export BACKEND_IP=$ec2_ips
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/frontend/.env      
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive  
       - destroy-environment
       - revert-migrations
-     # Here's where you will add some code to rollback on failure       
-
 workflows:
   udacity_project:
     jobs:
@@ -244,5 +281,6 @@ workflows:
       #    requires: [deploy-infrastructure]
       - run-migrations:
           requires: [build-backend]
-       #   requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
       

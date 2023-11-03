@@ -303,11 +303,8 @@ jobs:
           name: Get backend url
           command: |
             stack_name=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            instance_id=$(aws cloudformation describe-stacks --stack-name "$stack_name" --query 'Stacks[0].Outputs[?OutputKey==`YourOutputName`].OutputValue' --output text)
-            echo "${instance_id}"
-            ip_address=$(aws ec2 describe-instances --instance-ids "$instance_id" --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
-            echo "${ip_address}"
-            export BACKEND_IP=$ip_address
+            BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
+            echo "${BACKEND_IP}"
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl -s ${API_URL}/api/status | grep "ok"
@@ -328,7 +325,7 @@ jobs:
             else
               return 1
             fi
-      - destroy-environment
+      #- destroy-environment
       - revert-migrations
 
 workflows:

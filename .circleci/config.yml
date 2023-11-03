@@ -25,6 +25,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
+            yum install -y nodejs npm
             SUCCESS=$(curl --insecure  https://kvdb.io/6U9WncsVQmgqvAA9EPC2h6/migration_${CIRCLE_WORKFLOW_ID:0:7})
             ls
             cd backend
@@ -223,11 +224,11 @@ jobs:
       - run:
           name: Update packages
           command: | 
-            sudo yum update -y
+            yum update -y
       - run:
           name: Install npm
           command: | 
-            sudo yum install -y nodejs npm
+            yum install -y nodejs npm
       - run:
           name: Install tar
           command: | 

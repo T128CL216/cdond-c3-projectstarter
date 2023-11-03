@@ -302,13 +302,10 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            stack_name=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            instance_ids=$(aws cloudformation describe-stack-resources --stack-name "$stack_name" --query 'StackResources[?ResourceType==`AWS::EC2::Instance`].PhysicalResourceId' --output text)
-            ec2_ips=$(aws ec2 describe-instances --instance-ids $instance_ids --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            export BACKEND_IP=$ec2_ips
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo " API url is : ${API_URL}" 
-            if curl "${API_URL}/api/status" | grep "ok"
+            export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
+            export API_URL="http://${BACKEND_PUBLIC_IP}:3030"
+            echo "${API_URL}" 
+            if curl -s ${API_URL}/api/status | grep "ok"
             then
               return 0
             else

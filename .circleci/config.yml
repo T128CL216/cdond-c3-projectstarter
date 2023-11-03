@@ -332,9 +332,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: |
-            # your code here
+          name: Install tar
+          command: | 
+            yum install -y tar
+      - run:
+          name: Install GZIP
+          command: | 
+            yum install -y gzip
       - run:
           name: Update cloudfront distribution
           command: |
@@ -357,6 +361,8 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - attach_workspace:
+           at: ~/
       - run:
           name: Get old stack workflow id
           command: |

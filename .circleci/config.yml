@@ -302,7 +302,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            API_URL=$(awk -F= '/API_URL=/{print $2}' ~/.env
+            API_URL=$(awk -F= '/API_URL=/{print $2}' ~/.env)
             echo "API_URL: $API_URL"
       - run:
           name: Backend smoke test.

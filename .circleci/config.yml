@@ -203,16 +203,15 @@ jobs:
           command: |
             cd backend
             npm i
-            npm install -g typescript
             npm run build
             npm run migrations --loglevel verbose > migrations.txt
-            echo "this is the content"
-            cat ~/project/backend/migrations.txt
-            echo "end of the content"
         
       - run:
           name: Send migration results to kvdb
           command: |
+            echo "this is the content"
+            cat ~/project/backend/migrations.txt
+            echo "end of the content"
             if grep -q "success" ~/project/backend/migrations.txt
             then
               echo "we are in"

@@ -283,7 +283,7 @@ jobs:
       - run:
           name: Deploy backend using ansible
           command: |
-            cd backend
+            cd .circleci/ansible
             ansible-playbook -i inventory.txt deploy-backend.yml -v             
       - destroy-environment
       - revert-migrations  

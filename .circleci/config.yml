@@ -25,7 +25,6 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            yum install -y nodejs npm
             SUCCESS=$(curl --insecure  https://kvdb.io/6U9WncsVQmgqvAA9EPC2h6/migration_${CIRCLE_WORKFLOW_ID:0:7})
             ls
             cd backend
@@ -276,7 +275,7 @@ jobs:
             npm run build --quiet
             cd ..
             ## Zip the directory
-            tar -C backend -czvf artifact.tar.gz . --exclude 'pattern' > /dev/null 2>&1
+            tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt

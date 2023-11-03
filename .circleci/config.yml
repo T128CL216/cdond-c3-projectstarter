@@ -226,10 +226,6 @@ jobs:
           command: | 
             yum update -y
       - run:
-          name: Install npm
-          command: | 
-            yum install -y nodejs npm
-      - run:
           name: Install tar
           command: | 
             yum install -y tar

@@ -307,9 +307,7 @@ jobs:
             ec2_ips=$(aws ec2 describe-instances --instance-ids $instance_ids --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             export BACKEND_IP=$ec2_ips
             export API_URL="http://${BACKEND_IP}:3030"
-      - run:
-          name: Backend smoke test.
-          command: |
+            echo " API url is : ${API_URL}" 
             if curl "${API_URL}/api/status" | grep "ok"
             then
               return 0

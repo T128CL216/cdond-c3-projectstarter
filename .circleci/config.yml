@@ -284,14 +284,55 @@ jobs:
           name: Deploy backend using ansible
           command: |
             cd .circleci/ansible
-            ansible-playbook -i inventory.txt deploy-backend.yml -v             
+            ansible-playbook -i inventory.txt deploy-backend.yml           
       - destroy-environment
-      - revert-migrations  
+      - revert-migrations
+  smoke-test:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip nodejs npm ansible curl
+            pip install awscli
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Get backend url
+          command: |
+            API_URL=$(awk -F= '/API_URL=/{print $2}' ~/.env
+            echo "API_URL: $API_URL"
+      - run:
+          name: Backend smoke test.
+          command: |
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              return 0
+            else
+              return 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              # Change this to 0 after the job fails
+              return 1
+            else
+              return 1
+            fi
+      - destroy-environment
+      - revert-migrations
+
 workflows:
   udacity_project:
     jobs:
       # - build-frontend
-      - build-backend
+      #- build-backend
       # - test-frontend:
       #     requires: [build-frontend]
       # - test-backend:
@@ -311,4 +352,6 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
       

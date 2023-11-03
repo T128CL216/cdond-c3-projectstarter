@@ -252,6 +252,37 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive  
       - destroy-environment
       - revert-migrations
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["9c:21:50:8c:71:6c:ed:04:77:12:2e:ef:53:90:1d:6d"]
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip nodejs npm ansible curl
+            pip install awscli
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [build-backend]
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            ## Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml                    
+      - destroy-environment
+      - revert-migrations  
 workflows:
   udacity_project:
     jobs:
@@ -273,5 +304,7 @@ workflows:
       - run-migrations:
           requires: [build-backend,configure-infrastructure]
       - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
           requires: [run-migrations]
       
